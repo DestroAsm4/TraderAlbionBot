@@ -1,0 +1,9 @@
+opencv-python
+pyautogui
+pywin32
+deprecated
+pytesseract
+pyscreenshot
+pynput
+scapy
+keyboard
