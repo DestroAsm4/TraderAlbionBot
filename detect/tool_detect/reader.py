@@ -15,7 +15,8 @@ class Reader:
         self.config = None
 
     def read_text(self, x_y_text: tuple, config: Literal[
-        'mail_ind', 'read_mail', 'count_order', 'name_order', 'char_item', 'name_order', 'name_item', 'price_item'] = None) -> str:
+        'mail_ind', 'read_mail', 'count_order', 'name_order', 'char_item', 'name_order', 'name_item', 'price_item',
+        'number_item' ] = None) -> str:
 
         img = self.wincap.capture_win_alt()
 
@@ -43,6 +44,9 @@ class Reader:
             config = '--psm 6 --oem 3'
         elif config == 'price_item':
             lang = 'rus'
+            config = '--psm 7 --oem 3'
+        elif config == 'number_item':
+            lang = 'eng'
             config = '--psm 7 --oem 3'
         else:
             lang = 'rus'

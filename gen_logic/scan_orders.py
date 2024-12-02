@@ -5,22 +5,27 @@ from typing import Literal
 import win32gui
 
 from active.cliker import Clicker
+from bd.manage_bd import ManageBD
 from detect.tool_detect.detect import Detect
 from detect.tool_detect.reader import Reader
-from setting import Pathes, GameName, ActiveText, XYText, XYWHOrderBuy
+from setting import Pathes, GameName, ActiveText, XYText, XYWHOrderBuy, Order_data
 
 
 class ScanOrders:
 
     def __init__(self, play: bool = False, mod: str = 'test_data'):
-        self.detect_red_button = Detect(Pathes.red_button, coef_match=0.8, options='red_button')
-        self.detect_next_page = Detect(Pathes.next_page_order, coef_match=0.98) # 0.9 два 0,98 только нужное
+        self.detecter_red_button = Detect(Pathes.red_button, coef_match=0.8, options='red_button')
+        self.detecter_next_page_button = Detect(Pathes.next_page_order, coef_match=0.98) # 0.9 два 0,98 только нужное
         if play:
             self.gamename = GameName.albion
             self.focus_game()
         self.clicker = Clicker()
 
         self.reader = Reader(mod=mod)
+        self.data_order = Order_data
+        self.manage_bd = ManageBD()
+        self.all_numbers = []
+        self.numbers_100 = False
 
     def focus_game(self, gamename=None):
         if gamename:
@@ -31,47 +36,77 @@ class ScanOrders:
     def t_read(self, x_y):
         self.reader.read_text(x_y)
 
-    def read_data_scroll(self, points) -> dict:
-        count_item = self.reader.read_text(ActiveText.count_item_order(points), config='count_order')
-        number_item = self.reader.read_text(ActiveText.number_item_order(points), config='count_order')
-        # print(number_item.strip())
-        number_item = re.findall(r'\d+', number_item)[0]
-        # name = self.reader.read_text(ActiveText.name_item_order(points), config='name_order')
-        # name = name.strip()
-        # name = name.lower()
-        # name = name.split()
-        # name = [x.strip() for x in name]
-        # name = ' '.join(name)
-        # print(count_item)
+    def read_number_item(self, points):
+        if self.all_numbers:
+            if self.all_numbers[-1] == 99 or self.all_numbers[-1] > 99:
+                self.numbers_100 = True
 
-        # print(name.strip())
-        # print(count_item.strip())
+        if not self.numbers_100:
+            points_number = ActiveText.number_item_order(points)
+        else:
+            points_number = ActiveText.number_item_order_100(points)
+
+        while True:
+            number_item = self.reader.read_text(points_number, config='number_item')
+            # print(number_item.strip())
+            # print(number_item)
+            number_item = re.findall(r'\d+', number_item)
+
+            if number_item:
+                number_item = number_item[0]
+                break
+        return number_item
+
+    def read_data_scroll(self, points) -> dict:
+        while True:
+            count_item = self.reader.read_text(ActiveText.count_item_order(points), config='count_order')
+            print(count_item)
+            count_item = re.findall(r'\d+', count_item)
+            if count_item:
+                count_item = count_item[0]
+                break
+        number_item = self.read_number_item(points)
+
+
+
         return {
             # 'name': name,
-            'count': count_item.strip(),
+            'count': count_item,
             'naumber': number_item
         }
 
     def read_data_item(self):
         name_item = self.reader.read_text(XYText.name_item, config='name_item')
-        level_item = self.reader.read_text(XYText.level_item)
-        level_item = re.findall(r'\d+', level_item)
-        if level_item:
-            level_item = level_item[0]
-
-        char_item = self.reader.read_text(XYText.char_item, config='char_item')
-        char_item = char_item.lower().strip()
-        char_item = char_item.replace('о', '0')
-
-        char_item = re.findall(r'\d+', char_item)[0]
+        while True:
+            level_item = self.reader.read_text(XYText.level_item)
+            level_item = re.findall(r'\d+', level_item)
+            if level_item:
+                level_item = level_item[0]
+                break
+        while True:
+            char_item = self.reader.read_text(XYText.char_item, config='char_item')
+            # print(char_item)
+            char_item = char_item.lower().strip()
+            char_item = char_item.replace('о', '0')
+            char_item = re.findall(r'\d+', char_item)
+            if char_item:
+                char_item = char_item[0]
+                break
+        while True:
         # print('запись', char_item)
-        price_item = self.reader.read_text(XYText.price_item, config='price_item')
+            price_item = self.reader.read_text(XYText.price_item, config='price_item')
         # print(price_item)
-        if ',' in price_item:
-            price_item = price_item.replace(',', '')
-            price_item = re.findall(r'\d+', price_item)[0]
-        else:
-            price_item = re.findall(r'\d+', price_item)[0]
+            if ',' in price_item:
+                price_item = price_item.replace(',', '')
+                price_item = re.findall(r'\d+', price_item)
+                if price_item:
+                    price_item = price_item[0]
+                    break
+            else:
+                price_item = re.findall(r'\d+', price_item)
+                if price_item:
+                    price_item = price_item[0]
+                    break
         min_sell = self.reader.read_text(XYText.min_sell, config='price_item')
         if ',' in min_sell:
             min_sell = min_sell.replace(',', '')
@@ -108,64 +143,69 @@ class ScanOrders:
         self.clicker.close_item()
         return res
 
-    def t_scan(self):
+    def t_scan(self, mod: Literal['save'] = None):
         gen_res = []
         # points = self.detect.detect()
         # points = self.get_buy_orders(points, mod='buy_orders')
         end = False
         new_numbers_scroll = set()
         old_nubers_scroll = set()
-        all_numbers = []
+
 
         # points#
         while end == False:
             #получение координат объектов
             time.sleep(0.3)
-            points = self.detect_red_button.detect()
+            points = self.detecter_red_button.detect()
             points = self.get_buy_orders(points, mod='buy_orders')
 
 
             #перебор объектов
             for i in points:
                 #получние первичных данных объекта
-                time.sleep(0.3)
+                time.sleep(1)
                 res_scroll = self.read_data_scroll(i)
                 number = int(res_scroll['naumber'])
 
                 #запись объектов одного скрола
                 new_numbers_scroll.add(number)
 
-                if number not in all_numbers:
+                if number not in self.all_numbers:
                     #проверка счетчика
-                    print(number)
                     #действие
                     self.clicker.active_click_red_button(i[0], i[1])
                     time.sleep(0.3)
                     res_item = self.read_data_item()
                     time.sleep(0.5)
                     res_item['count'] = res_scroll['count']
+                    res_item['naumber'] = number
                     print(res_item)
                     gen_res.append(res_item)
 
                 else:
                     continue
 
-                all_numbers.append(number)
+                self.all_numbers.append(number)
 
 
-            if all_numbers[-1] % 50 == 0:
+            if self.all_numbers[-1] % 50 == 0:
                 self.clicker.next_page()
                 time.sleep(0.3)
                 old_nubers_scroll = new_numbers_scroll
                 new_numbers_scroll = set()
+                if mod == 'save':
+                    self.add_bd_orders(gen_res)
+                    gen_res = []
                 continue
             elif new_numbers_scroll == old_nubers_scroll:
+                if mod == 'save':
+                    self.add_bd_orders(gen_res)
                 break
 
             old_nubers_scroll = new_numbers_scroll
             new_numbers_scroll = set()
             self.clicker.scroll_order_buy()
-
+        return gen_res
         # res = list(res)
         # for i in gen_res:
         #     print(i)
@@ -176,8 +216,8 @@ class ScanOrders:
 
     def next_page(self):
         while True:
-            points = self.detect_next_page.detect()
-            print(points)
+            points = self.detecter_next_page_button.detect()
+            # print(points)
             if points:
                 self.clicker.next_page()
             else:
@@ -185,7 +225,7 @@ class ScanOrders:
 
 
     def scan(self):
-        points = self.detect_red_button.detect()
+        points = self.detecter_red_button.detect()
         points = self.get_buy_orders(points, mod='buy_orders')
         res = []
         # print(points)
@@ -201,8 +241,25 @@ class ScanOrders:
             print(res_item)
         return res
 
-    def add_bd_orders(self):
-        pass
+    def add_bd_orders(self, data_order: list[dict]):
+        '''
+        'name': name_item.strip().lower(),
+            'level': level_item,
+            'char': char_item,
+            'price_gen': price_item,
+            'min_sell': min_sell,
+            'max_buy': max_buy
+        '''
+        for order in data_order:
+            self.data_order.name = order['name']
+            self.data_order.level = order['level']
+            self.data_order.char = order['char']
+            self.data_order.price_gen = order['price_gen']
+            self.data_order.min_sell = order['min_sell']
+            self.data_order.max_buy = order['max_buy']
+            self.data_order.count = order['count']
+
+            self.manage_bd.new_t_data_order(self.data_order)
 
 
 
@@ -223,7 +280,11 @@ class ScanOrders:
 
 if __name__=='__main__':
     scan_test = ScanOrders(play=True)
-    scan_test.t_scan()
+    # char_item = scan_test.reader.read_text(XYText.char_item, config='char_item')
+    # print(char_item)
+    # scan_test.reader.read_text(ActiveText.count_item_order(points), config='count_order')
+    gen_res = scan_test.t_scan(mod='save')
+    # scan_test.add_bd_orders(gen_res)
     # scan_test = ScanOrders(play=True)
     # Clicker.scroll_order_buy()
     # scan_test = ScanOrders(play=True, mod='test_img')

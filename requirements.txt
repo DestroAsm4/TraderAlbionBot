@@ -7,3 +7,4 @@ pyscreenshot
 pynput
 scapy
 keyboard
+sqlalchemy

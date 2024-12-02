@@ -33,7 +33,7 @@ class XYText:
     time_trade: tuple = (796, 409, 1020, 425)
     is_trade_mail: tuple = (876, 375, 1020, 396)
     level_item: tuple = (514, 394, 529, 409)
-    char_item: tuple = (700, 396, 716, 409)
+    char_item: tuple = (700, 393, 716, 409)
     price_item: tuple = (567, 724, 722, 743)
     min_sell: tuple = (1018, 370, 1098, 386)
     max_buy: tuple = (1260, 369, 1365, 386)
@@ -44,7 +44,7 @@ class ActiveText:
     @staticmethod
     def count_item_order(x_y: tuple):
         x1 = x_y[0] - 380
-        x2 = x_y[0] - 335
+        x2 = x_y[0] - 340
         y1 = x_y[1] - 20
         y2 = x_y[1] + 20
         return (x1, y1, x2, y2)
@@ -53,6 +53,14 @@ class ActiveText:
     def number_item_order(x_y: tuple):
         x1 = x_y[0] - 640
         x2 = x_y[0] - 620
+        y1 = x_y[1] - 10
+        y2 = x_y[1] + 10
+        return (x1, y1, x2, y2)
+
+    @staticmethod
+    def number_item_order_100(x_y: tuple):
+        x1 = x_y[0] - 640
+        x2 = x_y[0] - 615
         y1 = x_y[1] - 10
         y2 = x_y[1] + 10
         return (x1, y1, x2, y2)
@@ -77,6 +85,18 @@ class Mail_data:
     price_gen: int
     datetime: datetime.datetime
     processed: bool
+
+
+@dataclass
+class Order_data:
+
+    name: str
+    level: int
+    char: int
+    price_gen: int
+    min_sell: int
+    max_buy: int
+    count: int
 
 @dataclass
 class BaseXYWH:

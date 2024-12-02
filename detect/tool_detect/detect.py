@@ -13,6 +13,9 @@ from setting import GameName
 
 
 class Detect:
+    '''
+    основные функции detect и read_text
+    '''
 
     def __init__(self,
                  object_detect_img_path=None,
@@ -45,7 +48,7 @@ class Detect:
     def read_text(self, x_y_text: tuple, config: Literal['mail_ind']=None) -> str:
 
 
-        # self.focus_game()
+
         img = self.wincap.capture_win_alt()
 
         # filename = r'D:\cods\python\my_pet\albion_bot\textreader\screenshots\new.png'
@@ -81,12 +84,12 @@ class Detect:
 
         return points
 
-        # return text
+
 
     def loop_detect(self, mod: Literal['print', 'vision']=None):
-        # self.focus_game()
+
         while True:
-            points =  self.detect()
+            self.detect()
             if mod == 'print':
                 print(self.detect())
 

@@ -1,5 +1,5 @@
 from detect.tool_detect.detect import Detect
-from gendata.setting import Pathes, GameName
+from setting import Pathes, GameName
 from active.cliker import Clicker
 # from detect.tool_detect.vision import Vision
 

@@ -1,158 +1,158 @@
 import sqlite3
+from typing import Literal
 
-
+from bd.data_setting import QueryParam
 
 import os.path
 
-from setting import Mail_data
+from setting import Mail_data, Order_data
 
 
-def path_to(name):
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(BASE_DIR, f"{name}.db")
-    return db_path
+
 
 
 class ManageBD:
 
     def __init__(self, file_bd: str = 'datatrade'):
 
-        self.file_bd = path_to(file_bd)
-        self.connection = None
+        self.file_bd = self.path_to(file_bd)
+        self.cursor = None
+        self.query = QueryParam
 
-    def set_name_table(self, name_table: str):
-        self.name_table = name_table
+    def path_to(self, name):
+        BASE_DIR = os.path.dirname(os.path.abspath(__name__))
+        db_path = os.path.join(BASE_DIR, f"{name}.db")
+        return db_path
 
-    def con(self):
-        self.connection = sqlite3.connect(self.file_bd)
 
-    def get_table(self):
-        self.con()
-        cursor = self.connection.cursor()
-        sqlite_select_query = f"""SELECT * from {self.name_table}"""
+
+    def _connect(self):
+        self.cursor = sqlite3.connect(self.file_bd).cursor()
+        return self.cursor
+
+    def _save_close_con(self):
+        self.cursor.commit()
+        self.cursor.close()
+
+    def _close_con(self):
+        self.cursor.close()
+
+
+
+
+
+    def create(self, active: Literal['buy_mail', 'sell_mail', 'order_sell', 'not_valid', 'valid_data']):
+
+        cursor = self._connect()
+
+        if active == 'buy_mail':
+            cursor.execute(self.query.create_mail_buy())
+        elif active == 'sell_mail':
+            cursor.execute(self.query.create_mail_sell())
+        elif active == 'order_sell':
+            cursor.execute(self.query.create_order_sell())
+        elif active == 'not_valid':
+            cursor.execute(self.query.create_not_valid())
+        elif active == 'valid_data':
+            cursor.execute(self.query.create_valid())
+
+        self._close_con()
+
+    def get_table(self, name_table: Literal['test_order_sell', 'valid_data']) -> list:
+        cursor = self._connect()
+        sqlite_select_query = f"""SELECT * from {name_table}"""
         cursor.execute(sqlite_select_query)
         records = cursor.fetchall()
-        print(records)
-
         cursor.close()
-        # return data
-
-    def create_db_and_table_order(self, name_table):
-
-        # Создаем подключение к базе данных (файл my_database.db будет создан)
-        #'count': count_item.strip()
-        # 'name': name_item.strip().lower(),
-        # 'level': level_item,
-        # 'char': char_item,
-        # 'price_gen': price_item,
-        # 'min_sell': min_sell,
-        # 'max_buy': max_buy
-        self.con()
-        cursor = self.connection.cursor()
-
-        # Создаем таблицу Users
-        cursor.execute(f'''
-        CREATE TABLE IF NOT EXISTS {name_table} (
-        id INTEGER PRIMARY KEY,
-        nameitem TEXT NOT NULL,
-        city TEXT NOT NULL,
-        count INTEGER,
-        level INTEGER NOT NULL,
-        char INTEGER,
-        min_sell INTEGER,
-        max_buy INTEGER
-        )
-        ''')
-
-        self.save_close_con()
-
-    def new_data_order(self, data_mail: Mail_data):
-        self.con()
-        cursor = self.connection.cursor()
-
-        if data_mail.active == 'buy':
-            self.name_table = 'buy_mail_table'
-        if data_mail.active == 'sell':
-            self.name_table = 'sell_mail_table'
-
-        cursor.execute(
-            f'''
-            INSERT INTO {self.name_table} (nameitem, city, count, level_item_name, price_one, price_gen, datetime, processed)
-             VALUES('{data_mail.name}', '{data_mail.city}', '{data_mail.count}',
-              '{data_mail.level_item_name}', '{data_mail.price_one}', '{data_mail.price_gen}',
-               '{data_mail.datetime}', {data_mail.processed} )
-            '''
-        )
-        self.save_close_con()
+        return records
 
 
-    def create_db_and_table(self, name_table):
 
-        # Создаем подключение к базе данных (файл my_database.db будет создан)
-        self.con()
-        cursor = self.connection.cursor()
+    def new_data_order(self, order_data: Order_data):
 
-        # Создаем таблицу Users
-        cursor.execute(f'''
-        CREATE TABLE IF NOT EXISTS {name_table} (
-        id INTEGER PRIMARY KEY,
-        nameitem TEXT NOT NULL,
-        city TEXT NOT NULL,
-        count INTEGER,
-        level_item_name TEXT NOT NULL,
-        price_one INTEGER,
-        price_gen INTEGER,
-        datetime DATETIME,
-        processed BOOL
-        )
-        ''')
+        cursor = self._connect()
+        cursor.execute(self.query.new_data_order(order_data))
+        self._save_close_con()
 
-        self.save_close_con()
+    def new_t_data_order(self, order_data: Order_data):
+        cursor = self._connect()
+        cursor.execute(self.query.new_t_data_order(order_data))
+        self._save_close_con()
 
-        # Сохраняем изменения и закрываем соединение
+    def new_valid_data(self, name):
+        cursor = self._connect()
 
-    def save_close_con(self):
-        self.connection.commit()
-        self.connection.close()
+        cursor.execute(self.query.new_valid(name))
+        self._save_close_con()
 
     def new_data_mail(self, data_mail: Mail_data):
-        self.con()
-        cursor = self.connection.cursor()
 
-        if data_mail.active == 'buy':
-            self.name_table = 'buy_mail_table'
-        if data_mail.active == 'sell':
-            self.name_table = 'sell_mail_table'
+        cursor = self._connect()
+        cursor.execute(self.query.new_mail(data_mail))
+        self._save_close_con()
 
-        cursor.execute(
-            f'''
-            INSERT INTO {self.name_table} (nameitem, city, count, level_item_name, price_one, price_gen, datetime, processed)
-             VALUES('{data_mail.name}', '{data_mail.city}', '{data_mail.count}',
-              '{data_mail.level_item_name}', '{data_mail.price_one}', '{data_mail.price_gen}',
-               '{data_mail.datetime}', {data_mail.processed} )
-            '''
-        )
-        self.save_close_con()
-
-    def deleteall(self, table_name):
-        self.con()
-        cursor = self.connection.cursor()
+    def delete_all_rows(self, table_name):
+        cursor = self._connect()
         cursor.execute(f'DELETE FROM `{table_name}`')
-        self.save_close_con()
+        self._save_close_con()
 
-    def del_table(self, name_table):
-        self.con()
-        cursor = self.connection.cursor()
+    def del_table(self, name_table: Literal['buy_mail', 'sell_mail', 'order_sell', 'not_valid', 'valid_data']):
+        cursor = self._connect()
         cursor.execute(
             f'''
             DROP TABLE IF EXISTS {name_table}
             '''
             )
-        self.save_close_con()
+        self._close_con()
 
-# order_bd = ManageBD(name_table='order_sell')
-# order_bd.del_table('mail_data')
-# mail_bd.deleteall('buy_mail_table')
+
+    def agree_valid(self, data):
+        order_data = Order_data
+        order_data.name = data[1]
+        order_data.level = data[2]
+        order_data.char = data[3]
+        order_data.price_gen = data[4]
+        order_data.min_sell = data[5]
+        order_data.max_buy = data[6]
+        order_data.count = data[7]
+        self.new_data_order(order_data)
+
+    def valid_order_data(self):
+        print('проверка данных')
+        datas = self.get_table('test_order_sell')
+        valids = self.get_table('valid_data')
+        valids_name = [x[1] for x in valids]
+        print(valids_name)
+        for i in datas:
+            print(i)
+            print('проверка в валидах, если есть выполнить запись и континуе')
+            if i[1] in valids_name:
+                self.agree_valid(i)
+                continue
+            while True:
+                answer = input('y/n: ')
+                if answer not in ['y', 'n']:
+                    print('не корректный ответ')
+                    continue
+                elif answer == 'y':
+                    print('запись в основу')
+                    print('если нет в валидах, то запись в валидные данные')
+                    self.agree_valid(i)
+                    self.new_valid_data(i[1])
+                    break
+                elif answer == 'n':
+                    print('запись номера плохой записи')
+                    break
+
+
+if __name__=='__main__':
+    order_bd = ManageBD()
+
+# order_bd.delete_all_rows('order_sell')
+# datas = order_bd.valid_order_data()
+
+# order_bd.del_table('order_sell')
+# order_bd.deleteall('order_sell')
 #
 # mail_bd.set_name_table('buy_mail_table')
 #

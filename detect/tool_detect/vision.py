@@ -13,7 +13,7 @@ class Vision:
     method = None
 
     # constructor
-    def __init__(self, needle_img_path, x_y_rb: tuple = None, x_y_lt: tuple=None, method=cv.TM_CCOEFF_NORMED):
+    def __init__(self, needle_img_path, method=cv.TM_CCOEFF_NORMED):
         # load the image we're trying to match
         # https://docs.opencv.org/4.2.0/d4/da8/group__imgcodecs.html
         self.needle_img = cv.imread(needle_img_path, cv.IMREAD_UNCHANGED)
