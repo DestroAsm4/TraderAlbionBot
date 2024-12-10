@@ -17,11 +17,14 @@ DB_PASS = os.environ.get('DB_PASS')
 
 
 def path_env():
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    '''
+    если sqlite
+    '''
+    BASE_DIR = os.path.dirname(os.path.abspath(__name__))
     db_path = os.path.join(BASE_DIR, f".env")
     return db_path
 
-class Settings(BaseSettings):
+class BDSettings(BaseSettings):
     DB_HOST: str
     DB_PORT: int
     DB_USER: str
@@ -55,7 +58,7 @@ class Settings(BaseSettings):
 
 
 
-
-settings = Settings()
-print(settings.DATABASE_URL_psycopg)
+if __name__=='__main__':
+    settings = BDSettings()
+    print(settings.DATABASE_URL_psycopg)
 # print(path_env())

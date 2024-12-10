@@ -1,11 +1,12 @@
-import sqlite3
+
 from typing import Literal
 
-from bd.data_setting import QueryParam
+from bd.data_list_query import QueryParam
 
 import os.path
 
 from setting import Mail_data, Order_data
+from bd_link_conf import BDSettings
 
 
 
@@ -15,14 +16,10 @@ class ManageBD:
 
     def __init__(self, file_bd: str = 'datatrade'):
 
-        self.file_bd = self.path_to(file_bd)
+        self.file_bd = BDSettings.DATABASE_URL_psycopg
         self.cursor = None
         self.query = QueryParam
 
-    def path_to(self, name):
-        BASE_DIR = os.path.dirname(os.path.abspath(__name__))
-        db_path = os.path.join(BASE_DIR, f"{name}.db")
-        return db_path
 
 
 

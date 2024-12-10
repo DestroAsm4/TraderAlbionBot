@@ -18,6 +18,8 @@ pyscreenshot = "^3.1"
 pynput = "^1.7.7"
 scapy = "^2.6.1"
 keyboard = "^0.13.5"
+psycopg = "^3.2.3"
+psycopg-binary = "^3.2.3"
 
 
 [build-system]
