@@ -1,6 +1,6 @@
-from detect.tool_detect.detect import Detect
+from app.detect.tool_detect.detect import Detect
 from setting import Pathes, GameName
-from active.cliker import Clicker
+from app.active.cliker import Clicker
 # from detect.tool_detect.vision import Vision
 
 class Scenaries:

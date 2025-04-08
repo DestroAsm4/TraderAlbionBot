@@ -2,16 +2,11 @@ import re
 from typing import Literal
 
 import datetime as datetime
-from PIL import Image
 
-
-
-import pytesseract
-
-from bd.manage_bd import ManageBD
-from detect.tool_detect.reader import Reader
-from detect.tool_detect.wincap import WindowCapture
-from setting import GameName, Mail_data, XYText
+from app.bd.manage_bd import ManageBD
+from app.detect.tool_detect.reader import Reader
+from app.detect.tool_detect.wincap import WindowCapture
+from app.setting import GameName, Mail_data, XYText
 
 
 class ScanMail:

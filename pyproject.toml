@@ -16,12 +16,20 @@ deprecated = "^1.2.15"
 pytesseract = "^0.3.13"
 pyscreenshot = "^3.1"
 pynput = "^1.7.7"
-scapy = "^2.6.1"
 keyboard = "^0.13.5"
 psycopg = "^3.2.3"
 psycopg-binary = "^3.2.3"
+alembic = "^1.14.1"
+asyncpg = "^0.30.0"
+pytest = "^8.3.4"
+impacket = "^0.12.0"
+scapy = "^2.6.1"
+pytest-asyncio = "^0.25.3"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"

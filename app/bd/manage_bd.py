@@ -1,12 +1,10 @@
 
 from typing import Literal
 
-from bd.data_list_query import QueryParam
+from app.bd.data_list_query import QueryParam
 
-import os.path
-
-from setting import Mail_data, Order_data
-from bd_link_conf import BDSettings
+from app.setting import Mail_data, Order_data
+from app.bd.bd_connect.bd_link_conf import BDSettings
 
 
 

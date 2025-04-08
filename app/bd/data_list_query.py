@@ -1,6 +1,4 @@
-from typing import Literal
-
-from setting import Order_data, Mail_data
+from app.setting import Order_data, Mail_data
 
 
 class QueryParam:
@@ -51,8 +49,7 @@ class QueryParam:
         return f'''
            CREATE TABLE IF NOT EXISTS not_valid (
            id INTEGER PRIMARY KEY,
-           name TEXT NOT NULL,
-           number INTEGER
+           name TEXT NOT NULL
            )
            '''
 

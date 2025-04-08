@@ -2,8 +2,8 @@ from typing import Literal
 
 import pytesseract
 from PIL import Image
-from detect.tool_detect.wincap import WindowCapture
-from setting import GameName, Mail_data
+from app.detect.tool_detect.wincap import WindowCapture
+from app.setting import GameName, Mail_data
 
 
 class Reader:

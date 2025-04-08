@@ -7,9 +7,9 @@ from PIL import Image
 
 import cv2 as cv
 
-from detect.tool_detect.vision import Vision
-from detect.tool_detect.wincap import WindowCapture
-from setting import GameName
+from app.detect.tool_detect.detect import Vision
+from app.detect.tool_detect.wincap import WindowCapture
+from app.setting import GameName
 
 
 class Detect:

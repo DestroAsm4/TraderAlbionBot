@@ -4,11 +4,11 @@ from typing import Literal
 
 import win32gui
 
-from active.cliker import Clicker
-from bd.manage_bd import ManageBD
-from detect.tool_detect.detect import Detect
-from detect.tool_detect.reader import Reader
-from setting import Pathes, GameName, ActiveText, XYText, XYWHOrderBuy, Order_data
+from app.active.cliker import Clicker
+from app.bd.manage_bd import ManageBD
+from app.detect.tool_detect.detect import Detect
+from app.detect.tool_detect.reader import Reader
+from app.setting import Pathes, GameName, ActiveText, XYText, XYWHOrderBuy, Order_data
 
 
 class ScanOrders:
