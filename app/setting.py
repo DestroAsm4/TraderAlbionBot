@@ -18,8 +18,11 @@ class Pathes:
 
 
 @dataclass
-class GameName:
+class WindowName:
     albion: str = r'Albion Online Client'
+    albbot: str = r'TraderAlbionBot - wincap.py'
+    steam: str = r'steam'
+    mainwindow: str = 'Этот компьютер — проводник'
 
 
 #при окне на весь экран без рамки, x_y для определения подхиодит иделально

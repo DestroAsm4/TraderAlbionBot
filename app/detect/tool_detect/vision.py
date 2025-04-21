@@ -104,3 +104,6 @@ class Vision:
             #cv.imwrite('result_click_point.jpg', haystack_img)
 
         return points
+
+if __name__ == '__main__':
+    pass

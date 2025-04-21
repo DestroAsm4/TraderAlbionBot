@@ -5,6 +5,7 @@ import win32gui
 from PIL import Image
 
 
+
 import cv2 as cv
 
 from app.detect.tool_detect.detect import Vision
@@ -96,6 +97,8 @@ class Detect:
             if cv.waitKey(1) == ord('q'):
                 cv.destroyAllWindows()
                 break
+
+
     @classmethod
     def focus_game(self, gamename):
         hwnd = win32gui.FindWindow(None, gamename)
@@ -109,3 +112,6 @@ class Detect:
 #     res = detecter.read_text(XYText.mail_ind, config='mail_ind')
 #     print(Parser.mail_ind(res))
 # print(res)
+
+if __name__ == '__main__':
+    pass

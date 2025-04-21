@@ -55,3 +55,6 @@ class Reader:
         text = pytesseract.image_to_string(cropped_im, lang=lang, config=config)
 
         return text
+
+if __name__ == '__main__':
+    pass
